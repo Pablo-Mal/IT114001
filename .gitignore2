@@ -1,0 +1,4 @@
+adding second .gitignore
+myprivatecreds2.*
+*.log
+.idea/*
