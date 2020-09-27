@@ -29,7 +29,7 @@ public class NumberGuesserHW {
 		System.out.println("That's right!");
 		level++;// level up!
 		saveLevel();
-		strikes = 0;
+      strikes = 0;
 		System.out.println("Welcome to level " + level);
 		number = getNumber(level);
 	}
@@ -90,13 +90,30 @@ public class NumberGuesserHW {
 
 	private void saveLevel() {
 		try (FileWriter fw = new FileWriter(saveFile)) {
-			fw.write("" + level);// here we need to convert it to a String to record correctly
+			fw.write("Level: " + level + " Strikes: " + strikes + " Number: " + number);// here we need to convert it to a String to record correctly
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-
+   private boolean savedGame() {
+      int saves[] = new int[2];
+      int i = 0;
+      File file = new File(saveFile);
+		if (!file.exists()) {
+			return false;
+		}
+      Scanner scanner = new Scanner(saveFile);
+		while (scanner.hasNextLine()) {
+            saves[i] = scanner.nextInt();
+            i++;
+         }
+         saves[0] = level;
+         saves[1] = strikes;
+         saves[2] = number;
+         return true;
+   }
+      
 	private boolean loadLevel() {
 		File file = new File(saveFile);
 		if (!file.exists()) {
@@ -107,7 +124,7 @@ public class NumberGuesserHW {
 				int _level = reader.nextInt();
 				if (_level > 1) {
 					level = _level;
-					break;
+               break;
 				}
 			}
 		} catch (FileNotFoundException e) {
