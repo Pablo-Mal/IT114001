@@ -82,7 +82,11 @@ public class NumberGuesserHW {
 		try {
 			guess = Integer.parseInt(message);
 		} catch (NumberFormatException e) {
-			System.out.println("You didn't enter a number, please try again");
+			if (message.equalsIgnoreCase("CheatCheat")){
+         System.out.println("Cheater!.........But go up a level :)");
+         return number;
+         }
+         System.out.println("You didn't enter a number, please try again");
 
 		}
 		return guess;
