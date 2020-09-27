@@ -7,10 +7,12 @@ import java.util.Scanner;
 
 public class NumberGuesserHW {
 	private int level = 1;
+   private int levelCheck = 1;
 	private int strikes = 0;
 	private int maxStrikes = 5;
 	private int number = 0;
 	private boolean isRunning = false;
+   final String saveFile2 = "numberGuesserSave2.txt";
 	final String saveFile = "numberGuesserSave.txt";
 
 	/***
@@ -19,8 +21,8 @@ public class NumberGuesserHW {
 	 * @param level (level to use as upper bounds)
 	 * @return number between bounds
 	 */
-	public static int getNumber(int level) {
-		int range = 9 + ((level - 1) * 5);
+	public static int getNumber(int levelCheck) {
+		int range = 9 + ((levelCheck - 1) * 5);
 		System.out.println("I picked a random number between 1-" + (range + 1) + ", let's see if you can guess.");
 		return new Random().nextInt(range) + 1;
 	}
@@ -28,10 +30,12 @@ public class NumberGuesserHW {
 	private void win() {
 		System.out.println("That's right!");
 		level++;// level up!
+      levelCheck++;
 		saveLevel();
+      saveLevel2();
 		strikes = 0;
-		System.out.println("Welcome to level " + level);
-		number = getNumber(level);
+		System.out.println("Welcome to level " + levelCheck);
+		number = getNumber(levelCheck);
 	}
 
 	private void lose() {
@@ -39,11 +43,13 @@ public class NumberGuesserHW {
 		System.out.println("The correct number was " + number);
 		strikes = 0;
 		level--;
+      levelCheck--;
 		if (level < 1) {
 			level = 1;
 		}
 		saveLevel();
-		number = getNumber(level);
+      saveLevel2();
+		number = getNumber(levelCheck);
 	}
 
 	private void processCommands(String message) {
@@ -96,6 +102,14 @@ public class NumberGuesserHW {
 			e.printStackTrace();
 		}
 	}
+   private void saveLevel2() {
+		try (FileWriter fw = new FileWriter(saveFile2)) {
+			fw.write("" + levelCheck);// here we need to convert it to a String to record correctly
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 	private boolean loadLevel() {
 		File file = new File(saveFile);
@@ -118,6 +132,31 @@ public class NumberGuesserHW {
 			return false;
 		}
 		return level > 1;
+	}
+   private boolean loadLevel2() {
+		File file2 = new File(saveFile2);
+		if (!file2.exists()) {
+			return false;
+		}
+		try (Scanner reader = new Scanner(file2)) {
+			while (reader.hasNextLine()) {
+				int _level = reader.nextInt();
+            levelCheck = _level;
+				if (levelCheck != level){
+               System.out.println("**************************************");
+               System.out.println("***Please Don't touch game code :)****");
+               System.out.println("**************************************");
+               level = levelCheck;
+            }  
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+			return false;
+		} catch (Exception e2) {
+			e2.printStackTrace();
+			return false;
+		}
+		return levelCheck > 1;
 	}
 
 	void run() {
