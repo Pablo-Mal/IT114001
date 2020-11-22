@@ -18,11 +18,6 @@ public class Room implements AutoCloseable {
     private final static String CREATE_ROOM = "createroom";
     private final static String JOIN_ROOM = "joinroom";
     
-    private final static String BOLD_TEXT = "bold";
-    private final static String ITALICS_TEXT = "italics";
-    //private final static String COLOR_TEXT = "color";
-    private final static String UNDERLINE_TEXT = "underline";
-    
     Random randomNum = new Random();
     private final static String ROLL_DIE = "roll";
     private int roll;
@@ -140,34 +135,22 @@ public class Room implements AutoCloseable {
 		case FLIP_COIN:
 			num = randomNum.nextInt(2);
 			if (num == 0) {
-				sendMessage(client, "You flipped HEADS");
+				sendMessage(client, "<b style=color:orange><i> You flipped HEADS </i></b>");
 			}else {
-				sendMessage(client, "You flipped TALES");
+				sendMessage(client, "<b style=color:orange><i> You flipped TALES </i></b>");
 			}
 			wasCommand = true;
 			break;
 		case ROLL_DIE:
-			roll = randomNum.nextInt(5)+1;
-			sendMessage(client, "You rolled a " + roll);
+			roll = randomNum.nextInt(6)+1;
+			sendMessage(client, "<b style=color:orange><i> You rolled a " + roll +" </i></b>");
 			wasCommand = true;
 			break;
-		case BOLD_TEXT:
+		/*case TEXT_COLOR:
+			sendMessage(client, "<b><style=color:red>" + message + "</b>");
 			
 			wasCommand = true;
-			break;
-		case ITALICS_TEXT:
-			
-			wasCommand = true;
-			break;
-		/*case COLOR_TEXT:
-			
-			wasCommand = true;
-			break; */
-		case UNDERLINE_TEXT:
-			
-			wasCommand = true;
-			break;
-		
+			break; */		
 		}
 	    }
 	}

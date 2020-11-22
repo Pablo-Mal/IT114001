@@ -1,5 +1,7 @@
 package server;
 
+import java.awt.*; 
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -69,15 +71,75 @@ public class ServerThread extends Thread {
      * @param message
      * @return
      */
+    
     protected boolean send(String clientName, String message) {
 	Payload payload = new Payload();
 	payload.setPayloadType(PayloadType.MESSAGE);
 	payload.setClientName(clientName);
+	
+	int count = 0;
+	
+	for (int i = 0; i < message.length(); i++)
+	{
+		if (message.charAt(i) == '!')
+		{
+			count++;
+		}
+		
+		if (message.charAt(i) == '@')
+		{
+			count++;
+		}
+
+		if (message.charAt(i) == '#')
+		{
+			count++;
+		}
+		
+		if (message.charAt(i) == '$')
+		{
+			count++;
+		}
+		
+    }
+	
+	if (count >= 2)
+	{
+		message = message.replace("!", "<b>");
+		message = message.replace("<b> ", "</b> ");
+		message = message.replace("@", "<i>");
+		message = message.replace("<i> ", "</i> ");
+		message = message.replace("#", "<u>");
+		message = message.replace("<u> ", "</u> ");
+		
+		if (message.contains("$r"))
+		{
+			message = message.replace("$r", "<b style=color:red>");
+		}
+		
+		if (message.contains("$g"))
+		{
+			message = message.replace("$g", "<b style=color:green>");
+		}
+		
+		if (message.contains("$b"))
+		{
+			message = message.replace("$b", "<b style=color:blue>");
+		}
+		
+		if (message.contains("$-"))
+		{
+			message = message.replace("$-", "</b>");
+		}
+	
+	}
+	//---------------------------------------	 
 	payload.setMessage(message);
 
 	return sendPayload(payload);
     }
-
+    
+   
     protected boolean sendConnectionStatus(String clientName, boolean isConnect, String message) {
 	Payload payload = new Payload();
 	if (isConnect) {
