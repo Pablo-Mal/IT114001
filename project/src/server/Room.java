@@ -18,15 +18,16 @@ public class Room implements AutoCloseable {
     private final static String CREATE_ROOM = "createroom";
     private final static String JOIN_ROOM = "joinroom";
     
+    private final static String BOLD_TEXT = "bold";
+    private final static String ITALICS_TEXT = "italics";
+    //private final static String COLOR_TEXT = "color";
+    private final static String UNDERLINE_TEXT = "underline";
+    
     Random randomNum = new Random();
     private final static String ROLL_DIE = "roll";
     private int roll;
     private final static String FLIP_COIN = "flipcoin";
     private int num;
-    private final static String DM = "@";
-    private final static String MUTE = "mute";
-    private final static String UNMUTE = "unmute";
-    
 
     public Room(String name) {
 	this.name = name;
@@ -110,7 +111,6 @@ public class Room implements AutoCloseable {
      */
     private boolean processCommands(String message, ServerThread client) {
 	boolean wasCommand = false;
-	Iterator<ServerThread> iter = clients.iterator();
 	try {
 	    if (message.indexOf(COMMAND_TRIGGER) > -1) {
 		String[] comm = message.split(COMMAND_TRIGGER);
@@ -124,7 +124,6 @@ public class Room implements AutoCloseable {
 		    command = command.toLowerCase();
 		}
 		String roomName;
-		String clientMuteUnmute;
 		switch (command) {
 		case CREATE_ROOM:
 		    roomName = comm2[1];
@@ -141,81 +140,42 @@ public class Room implements AutoCloseable {
 		case FLIP_COIN:
 			num = randomNum.nextInt(2);
 			if (num == 0) {
-				sendMessage(client, "<b style=color:orange><i> You flipped HEADS </i></b>");
+				sendMessage(client, "You flipped HEADS");
 			}else {
-				sendMessage(client, "<b style=color:orange><i> You flipped TALES </i></b>");
+				sendMessage(client, "You flipped TALES");
 			}
 			wasCommand = true;
 			break;
 		case ROLL_DIE:
-			roll = randomNum.nextInt(6)+1;
-			sendMessage(client, "<b style=color:orange><i> You rolled a " + roll +" </i></b>");
+			roll = randomNum.nextInt(5)+1;
+			sendMessage(client, "You rolled a " + roll);
 			wasCommand = true;
 			break;
-		case MUTE:
-			clientMuteUnmute = comm2[1];
-			if (!client.getClientName().equals(clientMuteUnmute)) {
-				client.mutedClients.add(clientMuteUnmute);
-				while (iter.hasNext()) {
-					ServerThread mutedC = iter.next();
-					if (mutedC.getClientName().equals(clientMuteUnmute)) {
-						mutedC.send("[Notification] ",client.getClientName() + " has MuTed you");
-						client.send("[Notification] ",mutedC.getClientName() + " has been muted");
-					}
-				}
-			}
+		case BOLD_TEXT:
+			
 			wasCommand = true;
-			break; 
-		case UNMUTE:
-			clientMuteUnmute = comm2[1];
-			client.mutedClients.remove(clientMuteUnmute);
-			while (iter.hasNext()) {
-					ServerThread mutedC = iter.next();
-					if (mutedC.getClientName().equals(clientMuteUnmute)) {
-						mutedC.send("[Notification] ",client.getClientName() + " has UnMUted you");
-						client.send("[Notification] ",mutedC.getClientName() + " has been UnMuted");
-					}
-				}
-				wasCommand = true;
-				break;
-			}	
+			break;
+		case ITALICS_TEXT:
+			
+			wasCommand = true;
+			break;
+		/*case COLOR_TEXT:
+			
+			wasCommand = true;
+			break; */
+		case UNDERLINE_TEXT:
+			
+			wasCommand = true;
+			break;
+		
 		}
+	    }
 	}
 	catch (Exception e) {
 	    e.printStackTrace();
 	}
 	return wasCommand;
     }
-    
-    protected boolean processPrivateMessage(String message, ServerThread client) {
-    	boolean wasPrivate = false;
-    	String privClient = null;
-    	String newMessage = message;
-    	try {
-    		if (message.indexOf(DM) > -1) 
-    		{
-    			String[] comm = message.split(DM);
-    			log.log(Level.INFO, message);
-    			String part1 = comm[1];
-    			String[] comm2 = part1.split(":");
-    			privClient = comm2[0];
-    			newMessage = comm2[1];
-    			wasPrivate = true;
-    			}
-    			
-    		Iterator<ServerThread> iter = clients.iterator();
-    		while (iter.hasNext()) {
-    			ServerThread c = iter.next();
-    			if (c.getClientName().equals(privClient)) {
-    				c.send(client.getClientName(), "PrivateMessageReceive" + newMessage);
-    				client.send(client.getClientName(), "PrivateMessageSent" + newMessage);
-    			}
-    		}
-    	}  catch (Exception e) {
-    	    e.printStackTrace();
-    	}
-    	return wasPrivate;
-	}
 
     // TODO changed from string to ServerThread
     protected void sendConnectionStatus(ServerThread client, boolean isConnect, String message) {
@@ -244,21 +204,14 @@ public class Room implements AutoCloseable {
 	    // it was a command, don't broadcast
 	    return;
 	}
-	if (processPrivateMessage(message, sender)) {
-		return;
-	}
 	
 	Iterator<ServerThread> iter = clients.iterator();
 	while (iter.hasNext()) {
 	    ServerThread client = iter.next();
-	    
-	    if (!client.isMuted(sender.getClientName())) {
-	    	boolean messageSent = client.send(sender.getClientName(), message);
-	    	if (!messageSent) {
-	    
-	    		iter.remove();
-	    		
-	    	}
+	    boolean messageSent = client.send(sender.getClientName(), message);
+	    if (!messageSent) {
+		iter.remove();
+		log.log(Level.INFO, "Removed client " + client.getId());
 	    }
 	}
     }

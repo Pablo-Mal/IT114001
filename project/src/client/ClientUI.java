@@ -8,8 +8,6 @@ import java.awt.FontMetrics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -29,8 +27,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ScrollPaneConstants;
-
-import server.ServerThread;
 
 public class ClientUI extends JFrame implements Event {
     /**
@@ -221,7 +217,7 @@ public class ClientUI extends JFrame implements Event {
     }
 
     void addMessage(String str) {
-	JEditorPane entry = new JEditorPane("text/html", "");
+	JEditorPane entry = new JEditorPane();
 	entry.setEditable(false);
 	// entry.setLayout(null);
 	entry.setText(str);
@@ -259,46 +255,6 @@ public class ClientUI extends JFrame implements Event {
 	userPanel.setMaximumSize(lock);
 	setVisible(true);
     }
-    
-    //Saves chat history
-    static void createFile(String fileName) {
-    	try 
-    	{
-    		File fileRef = new File(fileName);
-    		if (fileRef.createNewFile()) {
-    			System.out.println("Created new file");
-    		}else {
-    			System.out.println("File exists");
-    		}
-    		System.out.println(fileName + " is located at " + fileRef.getAbsolutePath());
-    	} catch (IOException ie) {
-    		ie.printStackTrace();
-    	}
-    }
-    
-    static void writeFile(String fileName, String msg) {
-    	try (FileWriter fw = new FileWriter(fileName, true)) {
-    		fw.write(msg);
-    		fw.write(System.lineSeparator());
-    	}catch (IOException ie) {
-    		ie.printStackTrace();
-    	}
-    }
-    
-        
-    /*void exportCurrentChat() {
-    	StringBuilder sb = new StringBuilder();
-    	Component[] comps = textArea.getComponents();
-    	for(Component c : comps) {
-    		JEditorPane j = (JEditorPane)c;
-    		if(j != null) {
-    			sb.append(j.getText() + System.lineSeparator());
-    		}
-    	}
-    	//todo save file
-    	sb.toString();
-    }
-    */
 
     @Override
     public void onClientConnect(String clientName, String message) {
@@ -327,20 +283,8 @@ public class ClientUI extends JFrame implements Event {
 
     @Override
     public void onMessageReceive(String clientName, String message) {
-    	log.log(Level.INFO, String.format("%s: %s", clientName, message));
-    	self.addMessage(String.format("%s: %s", clientName, message));
-    	writeFile("log.txt", clientName + ": " + message);
-    	
-    	//Get's muted person's name and adds them to muted.txt
-    	if (message.contains("muted")) {
-    		String newMessage = message.split(" ")[0];
-    		writeFile("muted.txt", newMessage);
-    	}
-    	// removed person's name from muted.txt
-    	if (message.contains("UnMuted")) {
-    		String newMessage = message.split(" ")[0];
-    		writeFile("muted.txt", newMessage.replace(newMessage, ""));
-    	} 
+	log.log(Level.INFO, String.format("%s: %s", clientName, message));
+	self.addMessage(String.format("%s: %s", clientName, message));
     }
 
     @Override
@@ -358,7 +302,5 @@ public class ClientUI extends JFrame implements Event {
 	if (ui != null) {
 	    log.log(Level.FINE, "Started");
 	}
-	createFile("log.txt");
-	createFile("muted.txt");
     }
 }

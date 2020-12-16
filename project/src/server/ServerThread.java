@@ -1,16 +1,11 @@
 package server;
 
-import java.util.List;
-import java.awt.*; 
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.ArrayList;
-import java.util.Arrays;
 
 public class ServerThread extends Thread {
     private Socket client;
@@ -20,13 +15,7 @@ public class ServerThread extends Thread {
     private Room currentRoom;// what room we are in, should be lobby by default
     private String clientName;
     private final static Logger log = Logger.getLogger(ServerThread.class.getName());
-    
-    List<String> mutedClients = new ArrayList<String>();
 
-    public boolean isMuted(String clientName) {
-    	return mutedClients.contains(clientName);
-    }
-    
     public String getClientName() {
 	return clientName;
     }
@@ -80,75 +69,15 @@ public class ServerThread extends Thread {
      * @param message
      * @return
      */
-    
     protected boolean send(String clientName, String message) {
 	Payload payload = new Payload();
 	payload.setPayloadType(PayloadType.MESSAGE);
 	payload.setClientName(clientName);
-	
-	int count = 0;
-	
-	for (int i = 0; i < message.length(); i++)
-	{
-		if (message.charAt(i) == '!')
-		{
-			count++;
-		}
-		
-		if (message.charAt(i) == '@')
-		{
-			count++;
-		}
-
-		if (message.charAt(i) == '#')
-		{
-			count++;
-		}
-		
-		if (message.charAt(i) == '$')
-		{
-			count++;
-		}
-		
-    }
-	
-	if (count >= 2)
-	{
-		message = message.replace("!", "<b>");
-		message = message.replace("<b> ", "</b> ");
-		message = message.replace("@", "<i>");
-		message = message.replace("<i> ", "</i> ");
-		message = message.replace("#", "<u>");
-		message = message.replace("<u> ", "</u> ");
-		
-		if (message.contains("$r"))
-		{
-			message = message.replace("$r", "<b style=color:red>");
-		}
-		
-		if (message.contains("$g"))
-		{
-			message = message.replace("$g", "<b style=color:green>");
-		}
-		
-		if (message.contains("$b"))
-		{
-			message = message.replace("$b", "<b style=color:blue>");
-		}
-		
-		if (message.contains("$-"))
-		{
-			message = message.replace("$-", "</b>");
-		}
-	
-	}
-	//---------------------------------------	 
 	payload.setMessage(message);
 
 	return sendPayload(payload);
     }
-    
-   
+
     protected boolean sendConnectionStatus(String clientName, boolean isConnect, String message) {
 	Payload payload = new Payload();
 	if (isConnect) {
