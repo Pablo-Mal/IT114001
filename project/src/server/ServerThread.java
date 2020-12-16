@@ -1,5 +1,6 @@
 package server;
 
+import java.util.List;
 import java.awt.*; 
 
 import java.io.IOException;
@@ -8,6 +9,8 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ServerThread extends Thread {
     private Socket client;
@@ -17,7 +20,13 @@ public class ServerThread extends Thread {
     private Room currentRoom;// what room we are in, should be lobby by default
     private String clientName;
     private final static Logger log = Logger.getLogger(ServerThread.class.getName());
+    
+    List<String> mutedClients = new ArrayList<String>();
 
+    public boolean isMuted(String clientName) {
+    	return mutedClients.contains(clientName);
+    }
+    
     public String getClientName() {
 	return clientName;
     }
